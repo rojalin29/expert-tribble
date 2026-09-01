@@ -1,0 +1,11 @@
+name: "Caller Workflow"
+
+on:
+  workflow_dispatch:
+
+jobs:
+  call-greeting:
+    uses: rojalin29/expert-tribble/.github/workflows/greeting.yml@main
+    with:
+      actor: "Rojalin"
+
