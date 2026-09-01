@@ -1,36 +1,27 @@
-name: "Lesson 2 - Exercise 2"
+name: "Lesson 2 - Exercise 3"
 
 on:
   workflow_dispatch:
 
 jobs:
-  sync:
+  test:
     runs-on: ubuntu-latest
 
-    outputs:
-      state: ${{ steps.sync_check.outputs.state }}
+    env:
+      RUN_ATTEMPT_NUMBER: ${{ github.run_attempt }}
+      MAXIMUM_ATTEMPTS: ${{ vars.MAXIMUM_ATTEMPTS }}
 
     steps:
-      - name: Determine whether to run the job `test` or halt the workflow run
-        id: sync_check
+      - name: Prevent reruns
         run: |
-          # The following will choose between `run` and `halt` randomly
-          if [ $((RANDOM % 2)) -eq 0 ]; then
-            echo "state=run" >> "$GITHUB_OUTPUT"
-            echo "Running the job `test`..."
-          else
-            echo "state=halt" >> "$GITHUB_OUTPUT"
-            echo "Skipping the job `test`..."
+          # Exit if the run number is greater than the maximum number of attempts
+          if [ $RUN_ATTEMPT_NUMBER -gt $MAXIMUM_ATTEMPTS ]; then
+            echo "Exiting because the run number is greater than the maximum number of attempts"
+            exit 1
           fi
 
-  test:
-    needs: sync
-    if: ${{ needs.sync.outputs.state == 'run' }}
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Run test suite
+      - name: Run job
         run: |
-          echo "Running tests..."
-          sleep 5
-          exit 0
+          echo "Running job"
+          sleep 1
+
